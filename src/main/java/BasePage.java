@@ -1,23 +1,22 @@
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -28,11 +27,13 @@ public class BasePage {
     private static String angularScript;
     private static String resetScript;
     protected static WebDriver driver;
+    private static WebElement captureButtonElement;
 
-    private static Long SELENIUM_WAIT_TIMEOUT = new Long(120);
-    private static Long SELENIUM_WAIT_STEP = new Long(200);
+    private static Long SELENIUM_WAIT_TIMEOUT = new Long(1200);
+    private static Long SELENIUM_WAIT_STEP = new Long(2000);
 
-/*    @BeforeMethod
+    /*
+    @BeforeMethod
     public void setup() throws InterruptedException {
         System.setProperty("webdriver.chrome.driver",
                 "/usr/local/bin/chromedriver");
@@ -43,10 +44,11 @@ public class BasePage {
         // maximized the browser window
         driver.manage().window().maximize();
         // drv.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    }*/
+    }
+    */
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         System.setProperty("webdriver.chrome.driver",
                 "/usr/local/bin/chromedriver");
         ChromeOptions options = new ChromeOptions();
@@ -54,19 +56,28 @@ public class BasePage {
         options.addArguments("ignore-certificate-errors");
         options.setAcceptInsecureCerts(true);
         String url = "https://localhost:4204";
+        // String url = "https://test2.axn.iddataweb.com/test-axn-aws/axn/oauth2/authorize?client_id=72d9f92cd87b4890&redirect_uri=%5Bmockrp2-base%5D%2FviewIDToken&scope=openid+idp.google+country.US&response_type=code";
         System.out.println("To load page: " + url);
-        driver=new ChromeDriver(options);
+        driver = new ChromeDriver(options);
         driver.get(url);
         waitForPageToLoad();
-        // driver.quit();
+        WebElement startButton = driver.findElement(By.id("dcui-start-button"));
+        clickOn(driver, startButton, 10);
+        waitForPageToLoad();
+        driver.quit();
 
+    }
+
+    public static void clickOn(WebDriver driver1, WebElement element, int timeout) {
+        new WebDriverWait(driver1, timeout).until(ExpectedConditions.elementToBeClickable(element));
+        element.click();
     }
 
     static {
         try {
             ClassLoader classLoader = BasePage.class.getClassLoader();
             // Getting resource(File) from class loader
-            File angularFile=new File(classLoader.getResource("js/check.js").getFile());
+            File angularFile = new File(classLoader.getResource("js/check.js").getFile());
             FileInputStream fileStream = new FileInputStream(angularFile);
             StringBuilder sb = new StringBuilder();
             int ch;
@@ -75,7 +86,7 @@ public class BasePage {
             }
             angularScript = sb.toString();
 
-            File resetFile=new File(classLoader.getResource("js/reset.js").getFile());
+            File resetFile = new File(classLoader.getResource("js/reset.js").getFile());
             fileStream = new FileInputStream(resetFile);
             sb = new StringBuilder();
             while ((ch = fileStream.read()) != -1) {
@@ -117,10 +128,12 @@ public class BasePage {
         System.out.println(String.format("Page loaded in %s millis for %s.", d2.getTime() - d1.getTime(), url.getPath()));
     }
 
-/*    @AfterMethod
+    /*
+    @AfterMethod
     public void teardown() {
         // closes all the browser windows opened by web driver
         drv.quit();
-    }*/
+    }
+    */
 
 }
