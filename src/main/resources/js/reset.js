@@ -1,0 +1,3 @@
+window.qa = {
+    doneRendering: false
+};
